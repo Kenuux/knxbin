@@ -240,6 +240,11 @@ haste.prototype.removeLineNumbers = function() {
 
 // Load a document and show it
 haste.prototype.loadDocument = function(key) {
+  const elements = document.getElementsByTagName('code');
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
+
   // Split the key up
   var parts = key.split('.', 2);
   // Ask for what we want
