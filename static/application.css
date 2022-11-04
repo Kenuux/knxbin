@@ -78,8 +78,9 @@ textarea {
 
 #key {
 	position: fixed;
-	top: 0px;
-	right: 0px;
+	/*top: 90vh;*/
+	bottom: 3vh;
+	right: 3vh;
 	z-index: +1000; /* watch out */
 }
 
@@ -144,14 +145,15 @@ button {
 }
 
 button.enabled {
-	color: #78797A;
+	color: #A6A6A6;
 	cursor: pointer;
 }
 
 .button-wrap .label {
 	display: none;
 	position: absolute;
-	top: 36px;
+	/*top: 36px;*/
+	bottom: 36px;
 	left: 50%;
 	margin-left: -46px;
 	text-align: center;
@@ -162,6 +164,7 @@ button.enabled {
 	border-radius: 3px;
 	font-size: 8px;
 	width: 80px;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .button-wrap .label.label--small {
