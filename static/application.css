@@ -78,7 +78,8 @@ textarea {
 
 #key {
 	position: fixed;
-	top: 0px;
+	/*top: 90vh;*/
+	bottom: 1vh;
 	right: 0px;
 	z-index: +1000; /* watch out */
 }
@@ -151,7 +152,8 @@ button.enabled {
 .button-wrap .label {
 	display: none;
 	position: absolute;
-	top: 36px;
+	/*top: 36px;*/
+	bottom: 36px;
 	left: 50%;
 	margin-left: -46px;
 	text-align: center;
