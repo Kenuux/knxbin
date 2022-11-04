@@ -4,12 +4,45 @@ Orginal Style from ethanschoonover.com/solarized (c) Jeremy Hull <sourdrums@gmai
 
 */
 
-.hljs {
+/*.hljs {
   display: block;
   overflow-x: auto;
   padding: 0.5em;
   background: #1E1F22;
-  color: #839496;
+  color: #78797A;
+}*/
+
+pre.code {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #1E1F22;
+  color: #78797A;
+  margin-left: 8em;
+  white-space: pre;
+  word-break: normal;
+  word-wrap: normal;
+}
+
+pre.code::before {
+  counter-reset: listing;
+}
+
+pre.code code {
+  counter-increment: listing;
+  text-align: left;
+  float: left;
+  clear: left;
+}
+
+pre.code code::before {
+  content: counter(listing) " ";
+  display: inline-block;
+  float: left;
+  height: 16px;
+  padding-left: 0;
+  margin-left: -28px;
+  color: #3D3F41;
 }
 
 .hljs-comment,

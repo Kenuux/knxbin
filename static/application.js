@@ -1,6 +1,6 @@
 /* global $, hljs, window, document */
 
-var workersUrl = 'https://knxbin.kenox.workers.dev/';
+const workersUrl = 'https://api.knx.cool/';
 
 ///// represents a single document
 var haste_document = function() {
@@ -8,7 +8,7 @@ var haste_document = function() {
 };
 
 // Escapes HTML tag characters
-haste_document.prototype.htmlEscape = function(s) {
+htmlEscape = function(s) {
   return s
     .replace(/&/g, '&amp;')
     .replace(/>/g, '&gt;')
@@ -28,7 +28,7 @@ haste_document.prototype.load = function(key, callback, lang) {
       _this.data = res.data;
 
       callback({
-        value: _this.data,
+        value: htmlEscape(_this.data),
         key: key,
         language: lang,
         lineCount: _this.data.split('\n').length
@@ -129,6 +129,10 @@ haste.prototype.configureKey = function(enable) {
 // Remove the current document (if there is one)
 // and set up for a new one
 haste.prototype.newDocument = function(hideHistory) {
+  const elements = document.getElementsByTagName('code');
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
   this.$box.hide();
   this.doc = new haste_document();
   this.setTitle();
@@ -170,16 +174,68 @@ haste.prototype.lookupTypeByExtension = function(ext) {
 // Add line numbers to the document
 // For the specified number of lines
 haste.prototype.addLineNumbers = function(lineCount) {
-  var h = '';
-  for (var i = 0; i < lineCount; i++) {
-    h += (i + 1).toString() + '<br/>';
+  removeElementsByClass('linenumber');
+
+  if(window.location.hash) {
+    const hash = window.location.hash.substring(1);
+    const lineElement = getLineElement(hash)
+    highlightNew(lineElement);
+
+    const y = lineElement.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({top: y, behavior: 'smooth'});
   }
-  $('#linenos').html(h);
+  /*for (var i = 0; i < lineCount; i++) {
+    let div = document.createElement('a');
+    div.classList.add('linenumber');
+    div.style.marginTop = i * 16 + 'px';
+    let line = i + 1;
+    div.id = 'line' + line;
+    div.href = '#' + line;
+    div.onclick = function() {
+        highlightLine(line);
+    }
+    let text = document.createTextNode(line.toString());
+    div.appendChild(text);
+    document.body.appendChild(div)
+  }
+
+  if(window.location.hash) {
+    const hash = window.location.hash.substring(1);
+    highlightLine(hash)
+
+    /*document.getElementById('line' + hash).scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });*/
+  //}
 };
+
+function highlightLine(line) {
+  var box = document.getElementById("box");
+  // create highlight div
+  removeElementsByClass('highlight');
+  let highlight = document.createElement('div');
+  highlight.classList.add('highlight');
+  highlight.style.marginTop = ((line - 1) * 16) + 'px';
+  box.insertBefore(highlight, box.firstChild);
+}
+
+function removeElementsByClass(className){
+  const elements = document.getElementsByClassName(className);
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
+}
 
 // Remove the line numbers
 haste.prototype.removeLineNumbers = function() {
-  $('#linenos').html('&gt;');
+  removeElementsByClass("highlight");
+  removeElementsByClass('linenumber');
+  let div = document.createElement('a');
+  div.classList.add('linenumber');
+  let text = document.createTextNode('>');
+  div.appendChild(text);
+  document.body.appendChild(div)
 };
 
 // Load a document and show it
@@ -191,12 +247,26 @@ haste.prototype.loadDocument = function(key) {
   _this.doc = new haste_document();
   _this.doc.load(parts[0], function(ret) {
     if (ret) {
-      _this.$code.html(ret.value);
+      const lines = ret.value.split(/\r\n|\r|\n/);
+      for (let i = 0; i < lines.length; i++) {
+        let code = document.createElement('code');
+        code.innerHTML = lines[i];
+        let pre = document.getElementById("box");
+        pre.appendChild(code);
+
+        code.onclick = function() {
+          var file = '/' + ret.key + "#" + (i + 1).toString();
+          window.history.pushState(null, _this.appName + '-' + ret.key, file);
+          highlightNew(code);
+        }
+      }
+
       _this.setTitle(ret.key);
       _this.fullKey();
       _this.$textarea.val('').hide();
       _this.$box.show().focus();
       _this.addLineNumbers(ret.lineCount);
+      //hljs.highlightAll();
     }
     else {
       _this.newDocument();
@@ -221,7 +291,21 @@ haste.prototype.lockDocument = function() {
       _this.showMessage(err.message, 'error');
     }
     else if (ret) {
-      _this.$code.html(ret.value);
+      //_this.$code.html(htmlEscape(ret.value));
+      const lines = ret.value.split(/\r\n|\r|\n/);
+      for (let i = 0; i < lines.length; i++) {
+        let code = document.createElement('code');
+        code.innerHTML = lines[i];
+        let pre = document.getElementById("box");
+        pre.appendChild(code);
+
+        code.onclick = function() {
+          var file = '/' + ret.key + "#" + (i + 1).toString();
+          window.history.pushState(null, _this.appName + '-' + ret.key, file);
+          highlightNew(code);
+        }
+      }
+
       _this.setTitle(ret.key);
       var file = '/' + ret.key;
       window.history.pushState(null, _this.appName + '-' + ret.key, file);
@@ -229,9 +313,36 @@ haste.prototype.lockDocument = function() {
       _this.$textarea.val('').hide();
       _this.$box.show().focus();
       _this.addLineNumbers(ret.lineCount);
+     // hljs.highlightAll();
     }
   });
 };
+
+function highlightNew(code) {
+  const codes = document.getElementsByTagName("code");
+  let maxWidth = 0;
+  for (let i = 0; i < codes.length; i++) {
+    if (codes[i].offsetWidth > maxWidth) {
+      maxWidth = codes[i].offsetWidth;
+    }
+    codes[i].style.removeProperty("background-color");
+  }
+
+  const windowWidth = $(window).width();
+  console.log("Window width: " + windowWidth + " - MaxWidth: " + maxWidth)
+  if(windowWidth > maxWidth)
+    maxWidth = windowWidth;
+
+  for (let i = 0; i < codes.length; i++) {
+    codes[i].style.width = maxWidth + 'px';
+  }
+
+  code.style.backgroundColor = "rgba(187, 128, 9, 0.25)";
+}
+
+function getLineElement(line) {
+  return document.getElementsByTagName("code")[line - 1];
+}
 
 haste.prototype.configureButtons = function() {
   var _this = this;
