@@ -175,6 +175,10 @@ haste.prototype.lookupTypeByExtension = function(ext) {
 // For the specified number of lines
 haste.prototype.addLineNumbers = function(lineCount) {
   removeElementsByClass('linenumber');
+  const elements = document.getElementsByTagName('code');
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
 
   if(window.location.hash) {
     const hash = window.location.hash.substring(1);
