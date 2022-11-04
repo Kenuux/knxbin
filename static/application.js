@@ -175,10 +175,6 @@ haste.prototype.lookupTypeByExtension = function(ext) {
 // For the specified number of lines
 haste.prototype.addLineNumbers = function(lineCount) {
   removeElementsByClass('linenumber');
-  const elements = document.getElementsByTagName('code');
-  while(elements.length > 0){
-    elements[0].parentNode.removeChild(elements[0]);
-  }
 
   if(window.location.hash) {
     const hash = window.location.hash.substring(1);
@@ -244,6 +240,11 @@ haste.prototype.removeLineNumbers = function() {
 
 // Load a document and show it
 haste.prototype.loadDocument = function(key) {
+  const elements = document.getElementsByTagName('code');
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
+
   // Split the key up
   var parts = key.split('.', 2);
   // Ask for what we want
