@@ -240,6 +240,8 @@ haste.prototype.removeLineNumbers = function() {
 
 // Load a document and show it
 haste.prototype.loadDocument = function(key) {
+  console.log("start loading document");
+  let start = Date.now();
   const elements = document.getElementsByTagName('code');
   while(elements.length > 0){
     elements[0].parentNode.removeChild(elements[0]);
@@ -272,6 +274,7 @@ haste.prototype.loadDocument = function(key) {
       _this.$box.show().focus();
       _this.addLineNumbers(ret.lineCount);
       //hljs.highlightAll();
+      console.log("loaded in " + start - Date.now());
     }
     else {
       _this.newDocument();
